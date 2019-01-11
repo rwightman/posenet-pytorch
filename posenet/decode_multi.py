@@ -27,7 +27,7 @@ def get_instance_score_fast(
 def build_part_with_score_torch(score_threshold, local_max_radius, scores):
     lmd = 2 * local_max_radius + 1
     max_vals = F.max_pool2d(scores, lmd, stride=1, padding=1)
-    max_loc = (scores == max_vals) & (scores > score_threshold)
+    max_loc = (scores == max_vals) & (scores >= score_threshold)
     max_loc_idx = max_loc.nonzero()
     scores_vec = scores[max_loc]
     sort_idx = torch.argsort(scores_vec, descending=True)
