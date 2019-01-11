@@ -4,12 +4,9 @@ import json
 import os
 import yaml
 
-from posenet.converter.config import load_config
+from posenet import MOBILENET_V1_CHECKPOINTS
 
-CFG = load_config()
-GOOGLE_CLOUD_STORAGE_DIR = CFG['GOOGLE_CLOUD_STORAGE_DIR']
-CHECKPOINTS = CFG['checkpoints']
-CHK = CFG['chk']
+GOOGLE_CLOUD_STORAGE_DIR = 'https://storage.googleapis.com/tfjs-models/weights/posenet/'
 
 
 def download_file(checkpoint, filename, base_dir):
@@ -34,7 +31,7 @@ def download(checkpoint, base_dir='./weights/'):
 
 
 def main():
-    checkpoint = CHECKPOINTS[CHK]
+    checkpoint = MOBILENET_V1_CHECKPOINTS[101]
     download(checkpoint)
 
 

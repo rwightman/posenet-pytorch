@@ -1,7 +1,5 @@
 from posenet.decode import *
 from posenet.constants import *
-import time
-import scipy.ndimage as ndi
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
