@@ -1,8 +1,8 @@
-import tensorflow as tf
 import cv2
 import time
 import argparse
 import os
+import torch
 
 import posenet
 
@@ -16,34 +16,32 @@ args = parser.parse_args()
 
 
 def main():
+    model = posenet.load_model(args.model)
+    model = model.cuda()
+    output_stride = model.output_stride
+    height = width = 513
 
-    with tf.Session() as sess:
-        model_cfg, model_outputs = posenet.load_model(args.model, sess)
-        height = model_cfg['height']
-        width = model_cfg['width']
-        output_stride = model_cfg['output_stride']
+    if args.output_dir:
+        if not os.path.exists(args.output_dir):
+            os.makedirs(args.output_dir)
 
-        if args.output_dir:
-            if not os.path.exists(args.output_dir):
-                os.makedirs(args.output_dir)
+    filenames = [
+        f.path for f in os.scandir(args.image_dir) if f.is_file() and f.path.endswith(('.png', '.jpg'))]
 
-        filenames = [
-            f.path for f in os.scandir(args.image_dir) if f.is_file() and f.path.endswith(('.png', '.jpg'))]
+    start = time.time()
+    for f in filenames:
+        input_image, draw_image = posenet.read_imgfile(f, width, height)
 
-        start = time.time()
-        for f in filenames:
-            input_image, draw_image = posenet.read_imgfile(f, width, height)
+        with torch.no_grad():
+            input_image = torch.Tensor(input_image).cuda()
 
-            heatmaps_result, offsets_result, displacement_fwd_result, displacement_bwd_result = sess.run(
-                model_outputs,
-                feed_dict={'image:0': input_image}
-            )
+            heatmaps_result, offsets_result, displacement_fwd_result, displacement_bwd_result = model(input_image)
 
             pose_scores, keypoint_scores, keypoint_coords = posenet.decode_multiple_poses(
-                heatmaps_result.squeeze(axis=0),
-                offsets_result.squeeze(axis=0),
-                displacement_fwd_result.squeeze(axis=0),
-                displacement_bwd_result.squeeze(axis=0),
+                heatmaps_result.squeeze(0),
+                offsets_result.squeeze(0),
+                displacement_fwd_result.squeeze(0),
+                displacement_bwd_result.squeeze(0),
                 output_stride=output_stride,
                 max_pose_detections=10,
                 min_pose_score=0.25)
@@ -65,7 +63,7 @@ def main():
                     for ki, (s, c) in enumerate(zip(keypoint_scores[pi, :], keypoint_coords[pi, :, :])):
                         print('Keypoint %s, score = %f, coord = %s' % (posenet.PART_NAMES[ki], s, c))
 
-        print('Average FPS:', len(filenames) / (time.time() - start))
+    print('Average FPS:', len(filenames) / (time.time() - start))
 
 
 if __name__ == "__main__":

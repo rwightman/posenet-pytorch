@@ -1,4 +1,4 @@
-import tensorflow as tf
+import torch
 import time
 import argparse
 import os
@@ -15,11 +15,11 @@ args = parser.parse_args()
 
 def main():
 
-    with tf.Session() as sess:
-        model_cfg, model_outputs = posenet.load_model(args.model, sess)
-        height = model_cfg['height']
-        width = model_cfg['width']
-        output_stride = model_cfg['output_stride']
+    with torch.no_grad():
+        model = posenet.load_model(args.model)
+        model = model.cuda()
+        output_stride = model.output_stride
+        height = width = 513
         num_images = args.num_images
 
         filenames = [
@@ -31,16 +31,15 @@ def main():
 
         start = time.time()
         for i in range(num_images):
-            heatmaps_result, offsets_result, displacement_fwd_result, displacement_bwd_result = sess.run(
-                model_outputs,
-                feed_dict={'image:0': images[filenames[i % len(filenames)]]}
-            )
+            input_image = torch.Tensor(images[filenames[i % len(filenames)]]).cuda()
 
+            results = model(input_image)
+            heatmaps, offsets, displacement_fwd, displacement_bwd = results
             output = posenet.decode_multiple_poses(
-                heatmaps_result.squeeze(axis=0),
-                offsets_result.squeeze(axis=0),
-                displacement_fwd_result.squeeze(axis=0),
-                displacement_bwd_result.squeeze(axis=0),
+                heatmaps.squeeze(0),
+                offsets.squeeze(0),
+                displacement_fwd.squeeze(0),
+                displacement_bwd.squeeze(0),
                 output_stride=output_stride,
                 max_pose_detections=10,
                 min_pose_score=0.25)

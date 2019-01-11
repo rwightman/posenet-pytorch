@@ -1,18 +1,16 @@
-## PoseNet Python
+## PoseNet Pytorch
 
-This repository contains a pure Python implementation (multi-pose only) of the Google TensorFlow.js Posenet model.
+This repository contains a PyTorch implementation (multi-pose only) of the Google TensorFlow.js Posenet model.
 
-I first adapted the JS code more or less verbatim and found the performance was low so made some vectorized numpy/scipy version of a few key functions (named `_fast`).
+This port is based on my Tensorflow Python (https://github.com/rwightman/posenet-python) conversion of the same model. An additional step of the algorithm was performed on the GPU in this implementation so it is faster and consumes less CPU (but more GPU). On a GTX 1080 Ti (or better) it can run over 130fps.
 
-Further optimization is possible. The MobileNet base models have a throughput of 200-300 fps on a GTX 1080 Ti (or better). The _fast_ post processing code limits this to about 80-100fps if all file io and drawing is removed from the loop. A Cython or pure C++ port would be ideal. 
+Further optimization is possible as the MobileNet base models have a throughput of 200-300 fps.
 
 ### Install
 
-A suitable Python 3.x environment with a recent version of Tensorflow is required. Development and testing was done with Python 3.6.8 and Tensorflow 1.12.0 from Conda.
+A suitable Python 3.x environment with a recent version of PyTorch is required. Development and testing was done with Python 3.7.1 and PyTorch 1.0 w/ CUDA10 from Conda.
 
-A conda environment with these packages should suffice: `conda install tensorflow-gpu scipy pyyaml opencv`
-
-Note: If you want to use the webcam demo, a pip version of opencv (`pip install python-opencv`) is required instead of the conda version. Anaconda's default opencv does not include ffpmeg/VideoCapture support.
+If you want to use the webcam demo, a pip version of opencv (`pip install python-opencv`) is required instead of the conda version. Anaconda's default opencv does not include ffpmeg/VideoCapture support. The python bindings for OpenCV 4.0 currently have a broken impl of drawKeypoints. Please force install of a 3.4.x version.
 
 ### Usage
 
@@ -20,7 +18,7 @@ There are three demo apps in the root that utilize the PoseNet model. They are v
 
 The first time these apps are run (or the library is used) model weights will be downloaded from the TensorFlow.js version and converted on the fly.
 
-For all demos, the model can be specified with the '--model` argument by using its ordinal id (0-3) or integer depth multiplier (50, 75, 100, 101). The default is the 101 model.
+For all demos, the model can be specified with the '--model` argument by using its integer depth multiplier (50, 75, 100, 101). The default is the 101 model.
 
 #### image_demo.py 
 
@@ -52,4 +50,5 @@ The Python conversion code that started me on my way was adapted from the CoreML
 * OpenGL rendering/drawing
 * Comment interfaces, tensor dimensions, etc
 * Implement batch inference for image_demo
+* Create a training routine and add models with more advanced CNN backbones
 

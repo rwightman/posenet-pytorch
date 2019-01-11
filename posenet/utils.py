@@ -6,10 +6,13 @@ import posenet.constants
 
 def read_cap(cap, width, height, hcrop=(280, 1000)):
     res, img = cap.read()
+    if not res:
+        return np.zeros((1, 3, height, width), dtype=np.float32), \
+               np.zeros((height, width, 3), dtype=np.float32)
 
     # NOTE currently just cropping out the middle to the targetmodel height/width
     # instead of doing a aspect ratio warping rescale.
-    # TODO explore impact of scaling on model performance
+    # TODO explore impact of scaling on models performance
     if hcrop is not None and hcrop[0] < img.shape[1] and hcrop[1] < img.shape[1]:
         img = img[:, hcrop[0]:hcrop[1], :]
     img = cv2.resize(img, (width, height), interpolation=cv2.INTER_LINEAR)
@@ -17,7 +20,7 @@ def read_cap(cap, width, height, hcrop=(280, 1000)):
     input_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     input_img = np.array(input_img, dtype=np.float32)
     input_img = input_img * (2.0 / 255.0) - 1.0
-    input_img = input_img.reshape(1, height, width, 3)
+    input_img = input_img.transpose((2, 0, 1)).reshape(1, 3, height, width)
 
     return input_img, img  # input image (for network), display image (for rendering)
 
@@ -29,7 +32,7 @@ def read_imgfile(path, width, height):
     input_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     input_img = np.array(input_img, dtype=np.float32)
     input_img = input_img * (2.0 / 255.0) - 1.0
-    input_img = input_img.reshape(1, height, height, 3)
+    input_img = input_img.transpose((2, 0, 1)).reshape(1, 3, height, width)
 
     return input_img, img  # input image (for network), display image (for rendering)
 
@@ -78,6 +81,7 @@ def draw_skeleton(
 def draw_skel_and_kp(
         img, instance_scores, keypoint_scores, keypoint_coords,
         min_pose_score=0.5, min_part_score=0.5):
+
     out_img = img
     adjacent_keypoints = []
     cv_keypoints = []
@@ -94,8 +98,9 @@ def draw_skel_and_kp(
                 continue
             cv_keypoints.append(cv2.KeyPoint(kc[1], kc[0], 10. * ks))
 
-    out_img = cv2.drawKeypoints(
-        out_img, cv_keypoints, outImage=np.array([]), color=(255, 255, 0),
-        flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    if cv_keypoints:
+        out_img = cv2.drawKeypoints(
+            out_img, cv_keypoints, outImage=np.array([]), color=(255, 255, 0),
+            flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     out_img = cv2.polylines(out_img, adjacent_keypoints, isClosed=False, color=(255, 255, 0))
     return out_img
