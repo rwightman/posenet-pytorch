@@ -19,7 +19,6 @@ def main():
         model = posenet.load_model(args.model)
         model = model.cuda()
         output_stride = model.output_stride
-        height = width = 513
         num_images = args.num_images
 
         filenames = [
@@ -27,7 +26,7 @@ def main():
         if len(filenames) > num_images:
             filenames = filenames[:num_images]
 
-        images = {f: posenet.read_imgfile(f, width, height)[0] for f in filenames}
+        images = {f: posenet.read_imgfile(f, 1.0, output_stride)[0] for f in filenames}
 
         start = time.time()
         for i in range(num_images):

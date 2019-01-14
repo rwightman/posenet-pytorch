@@ -10,6 +10,7 @@ parser.add_argument('--model', type=int, default=101)
 parser.add_argument('--cam_id', type=int, default=0)
 parser.add_argument('--cam_width', type=int, default=1280)
 parser.add_argument('--cam_height', type=int, default=720)
+parser.add_argument('--scale_factor', type=float, default=0.7125)
 args = parser.parse_args()
 
 
@@ -17,7 +18,6 @@ def main():
     model = posenet.load_model(args.model)
     model = model.cuda()
     output_stride = model.output_stride
-    model_height = model_width = 513
 
     cap = cv2.VideoCapture(args.cam_id)
     cap.set(3, args.cam_width)
@@ -26,7 +26,8 @@ def main():
     start = time.time()
     frame_count = 0
     while True:
-        input_image, display_image = posenet.read_cap(cap, model_width, model_height)
+        input_image, display_image, output_scale = posenet.read_cap(
+            cap, scale_factor=args.scale_factor, output_stride=output_stride)
 
         with torch.no_grad():
             input_image = torch.Tensor(input_image).cuda()
@@ -41,6 +42,8 @@ def main():
                 output_stride=output_stride,
                 max_pose_detections=10,
                 min_pose_score=0.15)
+
+        keypoint_coords *= output_scale
 
         # TODO this isn't particularly fast, use GL for drawing and display someday...
         overlay_image = posenet.draw_skel_and_kp(

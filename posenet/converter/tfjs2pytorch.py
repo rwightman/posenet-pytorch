@@ -72,11 +72,11 @@ def load_variables(chkpoint, base_dir=BASE_DIR):
     return state_dict
 
 
-def read_imgfile(path, width, height):
+def _read_imgfile(path, width, height):
     img = cv2.imread(path)
     img = cv2.resize(img, (width, height))
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = img.astype(float)
+    img = img.astype(np.float32)
     img = img * (2.0 / 255.0) - 1.0
     img = img.transpose((2, 0, 1))
     return img
@@ -96,9 +96,9 @@ def convert(model_id, model_dir, output_stride=16, image_size=513, check=True):
     checkpoint_path = os.path.join(model_dir, checkpoint_name) + '.pth'
     torch.save(m.state_dict(), checkpoint_path)
 
-    if check and os.path.exists("./tennis_in_crowd.jpg"):
+    if check and os.path.exists("./images/tennis_in_crowd.jpg"):
         # Result
-        input_image = read_imgfile("./tennis_in_crowd.jpg", width, height)
+        input_image = _read_imgfile("./images/tennis_in_crowd.jpg", width, height)
         input_image = np.array(input_image, dtype=np.float32)
         input_image = input_image.reshape(1, 3, height, width)
         input_image = torch.Tensor(input_image)
@@ -109,4 +109,3 @@ def convert(model_id, model_dir, output_stride=16, image_size=513, check=True):
         print(heatmaps_result.shape)
         print(heatmaps_result[:, 0:1, 0:1])
         print(torch.mean(heatmaps_result))
-
