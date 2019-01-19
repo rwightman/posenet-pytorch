@@ -1,8 +1,7 @@
 import urllib.request
-import sys
+import posixpath
 import json
 import os
-import yaml
 
 from posenet import MOBILENET_V1_CHECKPOINTS
 
@@ -10,7 +9,7 @@ GOOGLE_CLOUD_STORAGE_DIR = 'https://storage.googleapis.com/tfjs-models/weights/p
 
 
 def download_file(checkpoint, filename, base_dir):
-    url = os.path.join(GOOGLE_CLOUD_STORAGE_DIR, checkpoint, filename)
+    url = posixpath.join(GOOGLE_CLOUD_STORAGE_DIR, checkpoint, filename)
     urllib.request.urlretrieve(url, os.path.join(base_dir, checkpoint, filename))
 
 
