@@ -10,7 +10,13 @@ Further optimization is possible as the MobileNet base models have a throughput 
 
 A suitable Python 3.x environment with a recent version of PyTorch is required. Development and testing was done with Python 3.7.1 and PyTorch 1.0 w/ CUDA10 from Conda.
 
-If you want to use the webcam demo, a pip version of opencv (`pip install python-opencv`) is required instead of the conda version. Anaconda's default opencv does not include ffpmeg/VideoCapture support. The python bindings for OpenCV 4.0 currently have a broken impl of drawKeypoints. Please force install of a 3.4.x version.
+If you want to use the webcam demo, a pip version of opencv (`pip install python-opencv=3.4.5.20`) is required instead of the conda version. Anaconda's default opencv does not include ffpmeg/VideoCapture support. The python bindings for OpenCV 4.0 currently have a broken impl of drawKeypoints so please force install a 3.4.x version.
+
+A fresh conda Python 3.6/3.7 environment with the following installs should suffice: 
+```
+conda install -c pytorch pytorch cuda100
+pip install opencv-python==3.4.5.20
+```
 
 ### Usage
 
