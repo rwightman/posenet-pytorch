@@ -14,8 +14,8 @@ If you want to use the webcam demo, a pip version of opencv (`pip install python
 
 A fresh conda Python 3.6/3.7 environment with the following installs should suffice: 
 ```
-conda install -c pytorch pytorch cuda100
-pip install opencv-python==3.4.5.20
+conda install -c pytorch pytorch cudatoolkit
+pip install requests opencv-python==3.4.5.20
 ```
 
 ### Usage
