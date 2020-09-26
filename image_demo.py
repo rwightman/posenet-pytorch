@@ -18,7 +18,8 @@ args = parser.parse_args()
 
 def main():
     model = posenet.load_model(args.model)
-    model = model.cuda()
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = model.to(device=device)
     output_stride = model.output_stride
 
     if args.output_dir:
@@ -34,7 +35,7 @@ def main():
             f, scale_factor=args.scale_factor, output_stride=output_stride)
 
         with torch.no_grad():
-            input_image = torch.Tensor(input_image).cuda()
+            input_image = torch.Tensor(input_image).to(device=device)
 
             heatmaps_result, offsets_result, displacement_fwd_result, displacement_bwd_result = model(input_image)
 
