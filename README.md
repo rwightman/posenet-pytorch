@@ -1,5 +1,7 @@
 ## PoseNet Pytorch
 
+**NOTE:** This repository is no longer being maintained, please visit [Michelle Chan's](https://github.com/michellelychan) version at https://github.com/michellelychan/posenet-pytorch. She is adding training/fine-tune code, annotation tools, a streamlit app, and more.
+
 This repository contains a PyTorch implementation (multi-pose only) of the Google TensorFlow.js Posenet model.
 
 This port is based on my Tensorflow Python (https://github.com/rwightman/posenet-python) conversion of the same model. An additional step of the algorithm was performed on the GPU in this implementation so it is faster and consumes less CPU (but more GPU). On a GTX 1080 Ti (or better) it can run over 130fps.
