@@ -1,6 +1,6 @@
 ## PoseNet Pytorch
 
-**NOTE:** This repository is no longer being maintained, please visit [Michelle Chan's](https://github.com/michellelychan) version at https://github.com/michellelychan/posenet-pytorch. She is adding training/fine-tune code, annotation tools, a streamlit app, and more.
+**NOTE: This repository is no longer being maintained, please visit [Michelle Chan's](https://github.com/michellelychan) version at https://github.com/michellelychan/posenet-pytorch. She is adding training/fine-tune code, annotation tools, a streamlit app, and more.**
 
 This repository contains a PyTorch implementation (multi-pose only) of the Google TensorFlow.js Posenet model.
 
