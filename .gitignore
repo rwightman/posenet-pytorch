@@ -1,0 +1,23 @@
+
+images/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# PyTorch weights
+*.tar
+*.pth
+*.gz
+Untitled.ipynb
+Testing notebook.ipynb
